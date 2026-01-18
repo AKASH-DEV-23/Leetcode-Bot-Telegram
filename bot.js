@@ -2,7 +2,8 @@ import "dotenv/config";
 import { Bot } from "grammy";
 import { getDailyProblem } from "./leetcode.js";
 import express from "express";
-
+import { subscribe, unsubscribe, getUser } from "./store.js";
+import { hourKeyboard } from "./utils.js";
 
 import {
   extractImages,
@@ -21,10 +22,12 @@ if (!process.env.BOT_TOKEN) {
 
 export const bot = new Bot(process.env.BOT_TOKEN);
 
-// bot.use(async (ctx, next) => {
-//   console.log("📩 Update received:", ctx.update.update_id);
-//   await next();
-// });
+console.log("🤖 Bot instance created");
+
+bot.use(async (ctx, next) => {
+  console.log("📩 Update received:", ctx.update.update_id);
+  await next();
+});
 
 
 /* ----------------------------------
@@ -98,17 +101,65 @@ bot.command("daily", async (ctx) => {
   }
 });
 
+bot.command("subscribe", async (ctx) => {
+  await ctx.reply(
+    "⏰ Select the hour to receive the daily LeetCode question",
+    { reply_markup: hourKeyboard() }
+  );
+});
+
+bot.callbackQuery(/^hour_\d+$/, async (ctx) => {
+  const hour = Number(ctx.callbackQuery.data.split("_")[1]);
+  const chatId = ctx.chat.id;
+
+  const existingUser = getUser(chatId);
+  const formattedHour = `${String(hour).padStart(2, "0")}:00`;
+
+  // 🔁 Already subscribed at same time
+  if (existingUser && existingUser.hour === hour) {
+    await ctx.answerCallbackQuery({
+      text: `Already subscribed at ${formattedHour}`,
+      show_alert: false,
+    });
+
+    return ctx.reply(
+      `ℹ️ You are already subscribed at 🕒 ${formattedHour}`
+    );
+  }
+
+  // 🔄 Resubscribe / New subscribe
+  subscribe(chatId, hour);
+
+  await ctx.answerCallbackQuery();
+  await ctx.reply(
+    `✅ Subscribed!\n🕒 You'll receive the daily question at ${formattedHour}`
+  );
+});
+
+
+bot.command("unsubscribe", async (ctx) => {
+  unsubscribe(ctx.chat.id);
+  await ctx.reply("❌ You have been unsubscribed from daily questions.");
+});
+
+
 bot.on("message:text", async (ctx, next) => {
   const text = ctx.message.text.trim();
 
-  // Allow /daily (and /daily@BotName)
-  if (text === "/daily" || text.startsWith("/daily@")) {
+  // Allow known commands
+  if (
+    text === "/daily" || text.startsWith("/daily@") ||
+    text === "/subscribe" || text.startsWith("/subscribe@") ||
+    text === "/unsubscribe" || text.startsWith("/unsubscribe@")
+  ) {
     return next();
   }
 
-  // Any other text or command
-  return ctx.reply("ℹ️ Available command is /daily");
+  return ctx.reply(
+    "ℹ️ Available commands:\n/daily\n/subscribe\n/unsubscribe"
+  );
 });
+
 
 
 /* ----------------------------------
