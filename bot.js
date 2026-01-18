@@ -267,7 +267,10 @@ const PORT = process.env.PORT || 3000;
 
     await bot.api.setMyCommands([
       { command: "daily", description: "Today's POTD" },
+      { command: "subscribe", description: "Get daily question at a fixed time" },
+      { command: "unsubscribe", description: "Stop daily questions" },
     ]);
+
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
