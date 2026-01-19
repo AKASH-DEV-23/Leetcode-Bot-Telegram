@@ -51,6 +51,31 @@ subscribeCommand(bot);
 unsubscribeCommand(bot);
 
 /* ----------------------------------
+   FALLBACK FOR UNKNOWN MESSAGES
+----------------------------------- */
+bot.on("message:text", async (ctx) => {
+    const text = ctx.message.text;
+
+    // Ignore valid commands (already handled)
+    if (
+        text.startsWith("/daily") ||
+        text.startsWith("/subscribe") ||
+        text.startsWith("/unsubscribe")
+    ) {
+        return;
+    }
+
+    return ctx.reply(
+        `❓ Unknown command.\n\n` +
+        `✅ Available commands:\n` +
+        `/daily – Today's question\n` +
+        `/subscribe – Get daily question\n` +
+        `/unsubscribe – Stop daily questions`
+    );
+});
+
+
+/* ----------------------------------
    WEBHOOK SERVER
 ----------------------------------- */
 const app = express();
