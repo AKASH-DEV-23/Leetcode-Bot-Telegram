@@ -48,7 +48,7 @@ export default function subscribeCommand(bot) {
 
         await ctx.answerCallbackQuery();
         await ctx.reply(
-            `✅ Subscribed!\n🕒 You'll receive the daily question at ${formatted}`
+            `✅ Subscribed!\n🕒 You'll receive the daily question at ${formatted} UTC`
         );
     });
 }
