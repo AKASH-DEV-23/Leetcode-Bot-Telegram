@@ -6,7 +6,7 @@ export default function subscribeCommand(bot) {
     // /subscribe command
     bot.command("subscribe", async (ctx) => {
         await ctx.reply(
-            "⏰ Select the hour to receive the daily question",
+            "⏰ Select UTC time to receive the daily question",
             { reply_markup: hourKeyboard() }
         );
     });
@@ -25,11 +25,11 @@ export default function subscribeCommand(bot) {
         // already subscribed at same hour
         if (user && user.isSubscribed && user.hour === hour) {
             await ctx.answerCallbackQuery({
-                text: `Already subscribed at ${formatted}`,
+                text: `Already subscribed at ${formatted} UTC`,
                 show_alert: false,
             });
 
-            return ctx.reply(`ℹ️ You are already subscribed at 🕒 ${formatted}`);
+            return ctx.reply(`ℹ️ You are already subscribed at 🕒 ${formatted} UTC`);
         }
 
         // upsert subscription

@@ -20,7 +20,7 @@ if (!process.env.BOT_TOKEN) {
    GLOBAL MIDDLEWARE
 ----------------------------------- */
 bot.use(async (ctx, next) => {
-    console.log("📩 Update:", ctx.update.update_id);
+    // console.log("📩 Update:", ctx.update.update_id);
 
     if (ctx.chat?.id) {
         await User.updateOne(
@@ -69,7 +69,6 @@ const PORT = process.env.PORT || 3000;
 
 (async () => {
     await connectDB();
-    console.log("🗄️ bot is initializing");
     await bot.init();
     console.log("🤖 Bot initialized");
 
@@ -82,6 +81,6 @@ const PORT = process.env.PORT || 3000;
     await sendDailyLeetCode();
 
     app.listen(PORT, () =>
-        console.log(`🚀 Server running on port ${PORT}`)
+        console.log(`🚀 Server running on port http://localhost:${PORT}`)
     );
 })();
