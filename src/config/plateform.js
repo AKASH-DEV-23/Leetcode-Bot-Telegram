@@ -6,9 +6,5 @@ export const PLATFORM_CONFIG = {
     cf: {
         name: "Codeforces",
         baseUrl: "https://codeforces.com/contest/",
-    },
-    atc: {
-        name: "AtCoder",
-        baseUrl: "https://atcoder.jp/contests/",
-    },
+    }
 };

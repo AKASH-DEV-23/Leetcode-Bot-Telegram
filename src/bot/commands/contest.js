@@ -23,12 +23,12 @@ export default function contestCommand(bot) {
                         reply_markup: {
                             inline_keyboard: [
                                 [
-                                    { text: "🔥 LC Today", callback_data: "contest_lc_today" },
-                                    { text: "🚀 LC Upcoming", callback_data: "contest_lc_upcoming" }
+                                    { text: "🔥 LeetCode Today", callback_data: "contest_lc_today" },
+                                    { text: "🚀 LeetCode Upcoming", callback_data: "contest_lc_upcoming" }
                                 ],
                                 [
-                                    { text: "🔥 CF Today", callback_data: "contest_cf_today" },
-                                    { text: "🚀 CF Upcoming", callback_data: "contest_cf_upcoming" }
+                                    { text: "🔥 CodeForces Today", callback_data: "contest_cf_today" },
+                                    { text: "🚀 CodeForces Upcoming", callback_data: "contest_cf_upcoming" }
                                 ]
                             ]
                         }
@@ -152,7 +152,7 @@ async function handleContest(ctx, platform, range) {
         }
 
         message +=
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `━━━━━━━━━━━━━━━━━━━\n` +
             `🏆 *${c.title}*\n\n` +
             `📅 *${startDate}*\n` +
             `🕒 ${startTime} – ${endIST} (IST)\n` +

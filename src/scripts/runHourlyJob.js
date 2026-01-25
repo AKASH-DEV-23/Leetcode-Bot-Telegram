@@ -6,7 +6,6 @@ import { sendDailyLeetCode } from "../scheduler/sendDailyLeetcode.js";
 try {
     await connectDB();
     await sendDailyLeetCode();
-
 } catch (err) {
     console.error("❌ Daily job failed:", err);
     process.exit(1);
