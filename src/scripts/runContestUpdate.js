@@ -1,14 +1,15 @@
 import "dotenv/config";
 import mongoose from "mongoose";
 import { connectDB } from "../src/database/connect.js";
-import { sendDailyLeetCode } from "../src/scheduler/sendDailyLeetcode.js";
+import { updateAllContests } from "../src/services/updateAllContests.service.js";
 
 try {
+
     await connectDB();
-    await sendDailyLeetCode();
+    await updateAllContests();
 
 } catch (err) {
-    console.error("❌ Daily job failed:", err);
+    console.error("❌ Contest update failed:", err);
     process.exit(1);
 } finally {
     await mongoose.disconnect();

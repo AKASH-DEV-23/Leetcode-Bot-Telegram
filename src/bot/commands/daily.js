@@ -1,4 +1,4 @@
-import { getDailyProblem } from "../../services/leetcode.service.js"
+import { getDailyProblem } from "../../services/leetcodeDaily.service.js"
 import {
     extractImages,
     cleanText,

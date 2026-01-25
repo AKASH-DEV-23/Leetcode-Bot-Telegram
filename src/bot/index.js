@@ -4,11 +4,15 @@ import User from "../database/models/user.model.js";
 import { connectDB } from "../database/connect.js";
 import { bot } from "./botInstance.js";
 
+
 // command handlers
 import dailyCommand from "./commands/daily.js";
 import subscribeCommand from "./commands/subscribe.js";
 import unsubscribeCommand from "./commands/unsubscribe.js";
-import { sendDailyLeetCode } from "../scheduler/sendDailyLeetcode.js";
+
+import contestCommand from "./commands/contest.js";
+import { updateAllContests } from "../services/updateAllContests.service.js";
+
 
 
 if (!process.env.BOT_TOKEN) {
@@ -20,7 +24,7 @@ if (!process.env.BOT_TOKEN) {
    GLOBAL MIDDLEWARE
 ----------------------------------- */
 bot.use(async (ctx, next) => {
-    // console.log("📩 Update:", ctx.update.update_id);
+    console.log("📩 Update:", ctx.update.update_id);
 
     if (ctx.chat?.id) {
         await User.updateOne(
@@ -49,6 +53,8 @@ bot.catch(err => {
 dailyCommand(bot);
 subscribeCommand(bot);
 unsubscribeCommand(bot);
+contestCommand(bot);
+
 
 /* ----------------------------------
    FALLBACK FOR UNKNOWN MESSAGES
@@ -57,20 +63,16 @@ bot.on("message:text", async (ctx) => {
     const text = ctx.message.text;
 
     // Ignore valid commands (already handled)
-    if (
-        text.startsWith("/daily") ||
-        text.startsWith("/subscribe") ||
-        text.startsWith("/unsubscribe")
-    ) {
-        return;
-    }
+    if (text.startsWith("/")) return;
+
 
     return ctx.reply(
         `❓ Unknown command.\n\n` +
         `✅ Available commands:\n` +
         `/daily – Today's question\n` +
         `/subscribe – Get daily question\n` +
-        `/unsubscribe – Stop daily questions`
+        `/unsubscribe – Stop daily questions\n` +
+        `/contest – View contest schedule`
     );
 });
 
@@ -97,13 +99,15 @@ const PORT = process.env.PORT || 3000;
     await bot.init();
     console.log("🤖 Bot initialized");
 
+    await updateAllContests();
+
     await bot.api.setMyCommands([
-        { command: "daily", description: "Today's POTD" },
-        { command: "subscribe", description: "Get daily question at a fixed time" },
-        { command: "unsubscribe", description: "Stop daily questions" },
+        { command: "daily", description: "Today's problem" },
+        { command: "subscribe", description: "Enable daily problem" },
+        { command: "unsubscribe", description: "Disable daily problem" },
+        { command: "contest", description: "Contest schedule" },
     ]);
 
-    await sendDailyLeetCode();
 
     app.listen(PORT, () =>
         console.log(`🚀 Server running on port http://localhost:${PORT}`)
