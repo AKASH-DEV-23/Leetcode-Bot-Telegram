@@ -1,7 +1,7 @@
 import "dotenv/config";
 import mongoose from "mongoose";
-import { connectDB } from "../src/database/connect.js";
-import { sendDailyLeetCode } from "../src/scheduler/sendDailyLeetcode.js";
+import { connectDB } from "../database/connect.js";
+import { sendDailyLeetCode } from "../scheduler/sendDailyLeetcode.js";
 
 try {
     await connectDB();
