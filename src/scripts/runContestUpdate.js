@@ -1,7 +1,7 @@
 import "dotenv/config";
 import mongoose from "mongoose";
-import { connectDB } from "../src/database/connect.js";
-import { updateAllContests } from "../src/services/updateAllContests.service.js";
+import { connectDB } from "../database/connect.js";
+import { updateAllContests } from "../services/updateAllContests.service.js";
 
 try {
 
