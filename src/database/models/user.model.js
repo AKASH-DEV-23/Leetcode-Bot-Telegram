@@ -23,6 +23,20 @@ const userSchema = new mongoose.Schema(
             default: null,
         },
 
+        // Contest reminder settings
+        contestReminder: {
+            enabled: {
+                type: Boolean,
+                default: false,
+            },
+            hoursBefore: {
+                type: Number,
+                min: 1,
+                max: 12,
+                default: 1,
+            },
+        },
+
         lastSeen: {
             type: Date,
             default: Date.now,

@@ -13,6 +13,7 @@ import subscribeCommand from "./commands/subscribe.js";
 import unsubscribeCommand from "./commands/unsubscribe.js";
 import communityCommand from "./commands/community.js";
 import contestCommand from "./commands/contest.js";
+import contestReminderCommand from "./commands/contestReminder.js";
 
 const userCooldown = new Map();
 const warnedUsers = new Set();
@@ -95,6 +96,7 @@ subscribeCommand(bot);
 unsubscribeCommand(bot);
 contestCommand(bot);
 communityCommand(bot);
+contestReminderCommand(bot);
 
 
 /* ----------------------------------
@@ -108,7 +110,8 @@ bot.on("message:text", async (ctx) => {
         "/subscribe",
         "/unsubscribe",
         "/contest",
-        "/community"
+        "/community",
+        "/contest_reminder"
     ];
 
     if (validCommands.some(cmd => text.startsWith(cmd))) {
@@ -174,6 +177,7 @@ const PORT = process.env.PORT || 3000;
 
 (async () => {
     await connectDB();
+    console.log("bot intialization start");
     await bot.init();
     console.log("🤖 Bot initialized");
 
@@ -183,6 +187,7 @@ const PORT = process.env.PORT || 3000;
         { command: "unsubscribe", description: "Disable daily problem" },
         { command: "contest", description: "Contest schedule" },
         { command: "community", description: "Join discussion group" },
+        { command: "contest_reminder", description: "Set contest reminder" },
     ]);
 
 
