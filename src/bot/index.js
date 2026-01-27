@@ -3,6 +3,8 @@ import express from "express";
 import User from "../database/models/user.model.js";
 import { connectDB } from "../database/connect.js";
 import { bot } from "./botInstance.js";
+import mongoose from "mongoose";
+
 
 
 // command handlers
@@ -91,6 +93,19 @@ app.post("/webhook", (req, res) => {
 app.get("/", (_, res) => {
     res.send("LeetCode Bot is running 🚀");
 });
+
+app.get("/health", (_, res) => {
+    const dbStatus =
+        mongoose.connection.readyState === 1 ? "connected" : "disconnected";
+
+    res.status(200).json({
+        status: "ok",
+        db: dbStatus,
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+    });
+});
+
 
 const PORT = process.env.PORT || 3000;
 
