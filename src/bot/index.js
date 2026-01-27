@@ -114,8 +114,6 @@ const PORT = process.env.PORT || 3000;
     await bot.init();
     console.log("🤖 Bot initialized");
 
-    await updateAllContests();
-
     await bot.api.setMyCommands([
         { command: "daily", description: "Today's problem" },
         { command: "subscribe", description: "Enable daily problem" },

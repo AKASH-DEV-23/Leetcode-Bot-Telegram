@@ -1,0 +1,29 @@
+name: Update Contest Schedule
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run hourly LeetCode job
+        run: node src/scripts/runContestUpdate.js
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          MONGO_URI: ${{ secrets.MONGO_URI }}
