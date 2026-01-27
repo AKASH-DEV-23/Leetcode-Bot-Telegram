@@ -26,6 +26,11 @@ export default function dailyCommand(bot) {
 
             dailyCooldown.set(userId, now);
 
+            setTimeout(() => {
+                dailyCooldown.delete(userId);
+            }, DAILY_COOLDOWN_MS);
+
+
             const potd = await getDailyProblem();
             const { mainText, constraintsText } = cleanText(
                 potd.content,

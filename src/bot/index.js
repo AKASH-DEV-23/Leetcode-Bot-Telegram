@@ -11,10 +11,12 @@ import mongoose from "mongoose";
 import dailyCommand from "./commands/daily.js";
 import subscribeCommand from "./commands/subscribe.js";
 import unsubscribeCommand from "./commands/unsubscribe.js";
-
+import communityCommand from "./commands/community.js";
 import contestCommand from "./commands/contest.js";
-import { updateAllContests } from "../services/updateAllContests.service.js";
 
+const userCooldown = new Map();
+const warnedUsers = new Set();
+const COOLDOWN_TIME = 2000;
 
 
 if (!process.env.BOT_TOKEN) {
@@ -23,12 +25,48 @@ if (!process.env.BOT_TOKEN) {
 }
 
 /* ----------------------------------
+   RATE LIMIT MIDDLEWARE
+----------------------------------- */
+bot.use(async (ctx, next) => {
+    // Only rate limit text messages
+    if (!ctx.message?.text) return next();
+
+    const userId = ctx.from?.id;
+    if (!userId) return next();
+
+    const now = Date.now();
+    const lastRequest = userCooldown.get(userId) || 0;
+
+    if (now - lastRequest < COOLDOWN_TIME) {
+        if (!warnedUsers.has(userId)) {
+            warnedUsers.add(userId);
+            await ctx.reply("⏳ Please slow down. Wait 2 seconds.");
+
+            setTimeout(() => warnedUsers.delete(userId), COOLDOWN_TIME);
+        }
+        return;
+    }
+
+    userCooldown.set(userId, now);
+
+    setTimeout(() => {
+        userCooldown.delete(userId);
+    }, COOLDOWN_TIME);
+
+    warnedUsers.delete(userId);
+
+    await next();
+});
+
+
+
+/* ----------------------------------
    GLOBAL MIDDLEWARE
 ----------------------------------- */
 bot.use(async (ctx, next) => {
     console.log("📩 Update:", ctx.update.update_id);
 
-    if (ctx.chat?.id) {
+    if (ctx.chat?.id && ctx.message?.text) {
         await User.updateOne(
             { chatId: ctx.chat.id },
             {
@@ -56,6 +94,7 @@ dailyCommand(bot);
 subscribeCommand(bot);
 unsubscribeCommand(bot);
 contestCommand(bot);
+communityCommand(bot);
 
 
 /* ----------------------------------
@@ -64,19 +103,43 @@ contestCommand(bot);
 bot.on("message:text", async (ctx) => {
     const text = ctx.message.text;
 
-    // Ignore valid commands (already handled)
-    if (text.startsWith("/")) return;
+    const validCommands = [
+        "/daily",
+        "/subscribe",
+        "/unsubscribe",
+        "/contest",
+        "/community"
+    ];
 
+    if (validCommands.some(cmd => text.startsWith(cmd))) {
+        return;
+    }
 
     return ctx.reply(
-        `❓ Unknown command.\n\n` +
-        `✅ Available commands:\n` +
-        `/daily – Today's question\n` +
-        `/subscribe – Get daily question\n` +
-        `/unsubscribe – Stop daily questions\n` +
-        `/contest – View contest schedule`
+        `🤔 I didn't understand that.\n\n` +
+        `Here’s what you can do:\n\n` +
+        `📌 /daily – Today's problem\n` +
+        `📅 /contest – Contest schedule\n` +
+        `🚀 /subscribe – Get daily question\n` +
+        `🚀 /unsubscribe – Stop daily questions\n` +
+        `💬 /community – Join discussion group\n\n` +
+        `Need help? Join our community below 👇`,
+        {
+            reply_markup: {
+                inline_keyboard: [
+                    [
+                        {
+                            text: "🔥 Join Community",
+                            url: "https://t.me/leetcode_bot_discussion"
+                        }
+                    ]
+                ]
+            }
+        }
     );
 });
+
+
 
 
 /* ----------------------------------
@@ -119,6 +182,7 @@ const PORT = process.env.PORT || 3000;
         { command: "subscribe", description: "Enable daily problem" },
         { command: "unsubscribe", description: "Disable daily problem" },
         { command: "contest", description: "Contest schedule" },
+        { command: "community", description: "Join discussion group" },
     ]);
 
 
